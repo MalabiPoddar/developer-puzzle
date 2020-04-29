@@ -16,6 +16,7 @@ export class StocksComponent implements OnInit {
   public endDate: Date;
   public maxDate: Date;
   public subscription: Subscription;
+  public formLabel = STOCKS_CONSTANTS.stockPickerFormLabels;
 
   quotes$ = this.priceQuery.priceQueries$;
 
