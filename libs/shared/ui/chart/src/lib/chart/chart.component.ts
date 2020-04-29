@@ -14,7 +14,7 @@ import { CHART_MOCK_DATA } from './chart.constants';
 export class ChartComponent implements OnInit {
   @Input() data$: Observable<any>;
 
-  chart: {
+  public chart: {
     title: string;
     type: string;
     data: any;
