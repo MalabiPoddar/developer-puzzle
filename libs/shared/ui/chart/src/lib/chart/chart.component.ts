@@ -11,9 +11,9 @@ import { Observable } from 'rxjs';
   styleUrls: ['./chart.component.css']
 })
 export class ChartComponent implements OnInit {
-  @Input() data$:any;
+  @Input() data$: Observable<any>;
 
-  chart: {
+  public chart: {
     title: string;
     type: string;
     data: any;
