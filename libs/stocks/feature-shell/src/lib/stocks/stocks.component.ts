@@ -16,7 +16,8 @@ export class StocksComponent implements OnInit {
   public subscription: Subscription;
   public stockPickerForm: FormGroup;
   public timePeriods = STOCKS_CONSTANTS.timePeriods;
-
+  public formLabel = STOCKS_CONSTANTS.stockPickerFormLabels;
+  
   quotes$ = this.priceQuery.priceQueries$;
 
   constructor(private formBuilder: FormBuilder, private priceQuery: PriceQueryFacade) {
