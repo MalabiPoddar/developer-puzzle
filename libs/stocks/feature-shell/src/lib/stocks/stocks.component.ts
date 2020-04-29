@@ -40,11 +40,10 @@ export class StocksComponent implements OnInit {
   public fetchQuote(): void {
     const startDate = this.stockPickerForm.value.startDate;
     const endDate = this.stockPickerForm.value.endDate;
-    const period = STOCKS_CONSTANTS.MAX;
     if (this.stockPickerForm.valid) {
       this.updateDateOnError(this.stockPickerForm);
       const { symbol } = this.stockPickerForm.value;
-      this.priceQuery.fetchQuote(symbol, period);
+      this.priceQuery.fetchQuote(symbol, "max");
       this.priceQuery.fetchFilterQuote(startDate, endDate);
     }
   }

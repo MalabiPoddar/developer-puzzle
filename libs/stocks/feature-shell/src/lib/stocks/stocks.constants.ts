@@ -23,6 +23,4 @@ export class STOCKS_CONSTANTS {
         endDateErrorText: 'Please select an end date',
         goButtonText: 'Go'
     };
-
-    public static MAX : 'max';
 }
