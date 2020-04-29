@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { PriceQueryFacade } from '@coding-challenge/stocks/data-access-price-query';
+import { STOCKS_CONSTANTS } from './stocks.constants';
 
 @Component({
   selector: 'coding-challenge-stocks',
@@ -8,9 +11,11 @@ import { PriceQueryFacade } from '@coding-challenge/stocks/data-access-price-que
   styleUrls: ['./stocks.component.css']
 })
 export class StocksComponent implements OnInit {
-  stockPickerForm: FormGroup;
-  symbol: string;
-  period: string;
+  public period: string;
+  public symbol: string;
+  public subscription: Subscription;
+  public stockPickerForm: FormGroup;
+
 
   quotes$ = this.priceQuery.priceQueries$;
 
@@ -26,20 +31,19 @@ export class StocksComponent implements OnInit {
   ];
 
   constructor(private fb: FormBuilder, private priceQuery: PriceQueryFacade) {
-    this.stockPickerForm = fb.group({
-      symbol: [null, Validators.required],
-      period: [null, Validators.required]
-    });
   }
 
   ngOnInit() {
-    this.stockPickerForm.valueChanges.subscribe(this.fetchQuote);
-  }
-
-  fetchQuote() {
-    if (this.stockPickerForm.valid) {
-      const { symbol, period } = this.stockPickerForm.value;
-      this.priceQuery.fetchQuote(symbol, period);
-    }
+    this.stockPickerForm = this.fb.group({
+      symbol: [null, Validators.required],
+      period: [null, Validators.required]
+    });
+    this.stockPickerForm.valueChanges.pipe(
+      debounceTime(STOCKS_CONSTANTS.DEBOUNCETIME)).subscribe(value => {
+      if (this.stockPickerForm.valid) {
+        const { symbol, period } = value;
+        this.priceQuery.fetchQuote(symbol, period);
+      }
+    });
   }
 }
