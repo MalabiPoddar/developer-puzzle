@@ -1,31 +1,38 @@
-import { TestBed, async } from '@angular/core/testing';
+import { TestBed, async, ComponentFixture } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
+import { APP_CONSTANT } from './app.constants';
 
 describe('AppComponent', () => {
+  let component: AppComponent;
+  let compfixture: ComponentFixture<AppComponent>;
+  let app;
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [AppComponent]
+      declarations: [AppComponent],
+      imports: [RouterTestingModule]
     }).compileComponents();
   }));
 
+  beforeEach(() => {
+    compfixture = TestBed.createComponent(AppComponent);
+    component = compfixture.componentInstance;
+    compfixture.detectChanges();
+    app = compfixture.debugElement.nativeElement;
+  });
+
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app).toBeTruthy();
+    expect(component).toBeTruthy();
   });
 
   it(`should have as title 'stocks'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('stocks');
+    expect(component.title).toEqual(APP_CONSTANT.TITLE);
   });
 
   it('should render title in a h1 tag', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain(
-      'Welcome to stocks!'
+    expect(app.querySelector('h1').textContent).toContain(
+      APP_CONSTANT.WELCOME_TEXT
     );
   });
 });
