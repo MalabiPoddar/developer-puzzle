@@ -17,7 +17,7 @@ export class StocksComponent implements OnInit {
   quotes$ = this.priceQuery.priceQueries$;
 
   constructor(private fb: FormBuilder, private priceQuery: PriceQueryFacade) {
-    this.stockPickerForm = fb.group({
+    this.stockPickerForm = this.fb.group({
       symbol: [null, Validators.required],
       period: [null, Validators.required]
     });
