@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { STOCKS_CONSTANTS } from './stocks.constants';
 import { PriceQueryFacade } from '@coding-challenge/stocks/data-access-price-query';
 
 @Component({
@@ -8,36 +10,62 @@ import { PriceQueryFacade } from '@coding-challenge/stocks/data-access-price-que
   styleUrls: ['./stocks.component.css']
 })
 export class StocksComponent implements OnInit {
-  stockPickerForm: FormGroup;
-  symbol: string;
-  period: string;
+  public stockPickerForm: FormGroup;
+  public symbol: string;
+  public startDate: Date;
+  public endDate: Date;
+  public maxDate: Date;
+  public subscription: Subscription;
 
   quotes$ = this.priceQuery.priceQueries$;
 
-  timePeriods = [
-    { viewValue: 'All available data', value: 'max' },
-    { viewValue: 'Five years', value: '5y' },
-    { viewValue: 'Two years', value: '2y' },
-    { viewValue: 'One year', value: '1y' },
-    { viewValue: 'Year-to-date', value: 'ytd' },
-    { viewValue: 'Six months', value: '6m' },
-    { viewValue: 'Three months', value: '3m' },
-    { viewValue: 'One month', value: '1m' }
-  ];
+  constructor(private fb: FormBuilder, private priceQuery: PriceQueryFacade) {}
 
-  constructor(private fb: FormBuilder, private priceQuery: PriceQueryFacade) {
-    this.stockPickerForm = fb.group({
+  ngOnInit() {
+    this.maxDate = new Date();
+    this.stockPickerForm = this.fb.group({
       symbol: [null, Validators.required],
-      period: [null, Validators.required]
+      startDate: [null, Validators.required],
+      endDate: [null, Validators.required]
     });
+    this.subscription = this.stockPickerForm.valueChanges.subscribe(value => {
+      const { startDate, endDate } = value;
+      if (endDate != null && endDate < startDate){    
+        this.stockPickerForm.patchValue({startDate : new Date(endDate)});
+      }
+    })
   }
 
-  ngOnInit() {}
-
-  fetchQuote() {
+  public fetchQuote(): void {
+    const startDate = this.stockPickerForm.value.startDate;
+    const endDate = this.stockPickerForm.value.endDate;
+    const period = STOCKS_CONSTANTS.MAX;
     if (this.stockPickerForm.valid) {
-      const { symbol, period } = this.stockPickerForm.value;
+      this.updateDateOnError(this.stockPickerForm);
+      const { symbol } = this.stockPickerForm.value;
       this.priceQuery.fetchQuote(symbol, period);
+      this.priceQuery.fetchFilterQuote(startDate, endDate);
     }
+  }
+
+  public updateDateOnError(stockPickerForm: FormGroup): void {
+    if (this.dateValidation(stockPickerForm)) {
+      this.stockPickerForm.value.startDate = stockPickerForm.value.endDate;
+      this.stockPickerForm.controls['startDate'].setValue(stockPickerForm.value.endDate);
+    }
+  }
+
+  public dateValidation(stockPickerForm: FormGroup): boolean {
+    if(stockPickerForm.value.startDate && stockPickerForm.value.endDate) {
+      const fromDate = Date.parse(stockPickerForm.value.startDate);
+      const toDate = Date.parse(stockPickerForm.value.endDate);
+      if (fromDate > toDate) {
+      return true
+      }
+    }
+  }
+  
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 }
