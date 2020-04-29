@@ -15,26 +15,15 @@ export class StocksComponent implements OnInit {
   public symbol: string;
   public subscription: Subscription;
   public stockPickerForm: FormGroup;
-
+  public timePeriods = STOCKS_CONSTANTS.timePeriods;
 
   quotes$ = this.priceQuery.priceQueries$;
 
-  timePeriods = [
-    { viewValue: 'All available data', value: 'max' },
-    { viewValue: 'Five years', value: '5y' },
-    { viewValue: 'Two years', value: '2y' },
-    { viewValue: 'One year', value: '1y' },
-    { viewValue: 'Year-to-date', value: 'ytd' },
-    { viewValue: 'Six months', value: '6m' },
-    { viewValue: 'Three months', value: '3m' },
-    { viewValue: 'One month', value: '1m' }
-  ];
-
-  constructor(private fb: FormBuilder, private priceQuery: PriceQueryFacade) {
+  constructor(private formBuilder: FormBuilder, private priceQuery: PriceQueryFacade) {
   }
 
   ngOnInit() {
-    this.stockPickerForm = this.fb.group({
+    this.stockPickerForm = this.formBuilder.group({
       symbol: [null, Validators.required],
       period: [null, Validators.required]
     });
@@ -45,5 +34,9 @@ export class StocksComponent implements OnInit {
         this.priceQuery.fetchQuote(symbol, period);
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 }
